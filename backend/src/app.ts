@@ -43,8 +43,8 @@ app.use(
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
-// Health Check Endpoints (support /api/health, /health, /)
-const healthHandler = (req: Request, res: Response) => {
+// Health Check Endpoint
+app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -52,26 +52,16 @@ const healthHandler = (req: Request, res: Response) => {
     version: '1.0.0',
     environment: env.NODE_ENV,
   });
-};
-app.get('/api/health', healthHandler);
-app.get('/health', healthHandler);
-app.get('/', healthHandler);
+});
 
-// REST API Routes (mounted with and without /api prefix for robust Vercel routing)
+// REST API Routes
 app.use('/api/auth', authRoutes);
-app.use('/auth', authRoutes);
-
 app.use('/api/income', incomeRoutes);
-app.use('/income', incomeRoutes);
-
 app.use('/api/expenses', expenseRoutes);
-app.use('/expenses', expenseRoutes);
-
 app.use('/api/summary', summaryRoutes);
-app.use('/summary', summaryRoutes);
 
-// Catch-all 404 for undefined routes
-app.use((req: Request, res: Response) => {
+// Catch-all 404 for undefined API routes
+app.use('/api/*', (req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: `API endpoint ${req.method} ${req.originalUrl} not found`,
