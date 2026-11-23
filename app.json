@@ -1,3 +1,12 @@
 {
-  "expo": {}
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "5329f326-8ac4-4e12-adca-56e92e8530da"
+      }
+    },
+    "android": {
+      "package": "com.armannaqvi.monthlybudgettracker"
+    }
+  }
 }
