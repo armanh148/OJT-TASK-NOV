@@ -54,6 +54,22 @@ app.get('/api/health', (req: Request, res: Response) => {
   });
 });
 
+// Root API Welcome / Status Endpoint
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'Monthly Budget Tracker Backend API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      income: '/api/income',
+      expenses: '/api/expenses',
+      summary: '/api/summary',
+    },
+  });
+});
+
 // REST API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/income', incomeRoutes);
