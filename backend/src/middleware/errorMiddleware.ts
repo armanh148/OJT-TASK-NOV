@@ -33,6 +33,18 @@ export function errorMiddleware(
     return;
   }
 
+  // Prisma database connection error (missing or incorrect DATABASE_URL in cloud deployment)
+  if (
+    err.name === 'PrismaClientInitializationError' ||
+    (typeof err.code === 'string' && err.code.startsWith('P1'))
+  ) {
+    res.status(503).json({
+      success: false,
+      message: 'Database connection failed. Please ensure DATABASE_URL is added to your Vercel Project Environment Variables.',
+    });
+    return;
+  }
+
   // Prisma record not found
   if (err.code === 'P2025') {
     res.status(404).json({
