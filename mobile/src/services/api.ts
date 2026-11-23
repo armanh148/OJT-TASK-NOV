@@ -6,10 +6,21 @@ const TOKEN_KEY = '@budget_tracker_token';
 const USER_KEY = '@budget_tracker_user';
 const API_URL_KEY = '@budget_tracker_api_url';
 
-// Auto-detect the development machine's IP address dynamically:
-// - Physical Android phone or iPhone running Expo Go connects to the PC's LAN IP
-// - Fallback to current host IP: 192.168.0.100
+// Auto-detect the backend API URL:
+// 1. Explicit environment variable: EXPO_PUBLIC_API_URL (e.g. from .env or EAS build secrets)
+// 2. Constants extra configuration
+// 3. Physical phone / Expo Go LAN IP auto-detection via hostUri
+// 4. Fallback to LAN IP: http://192.168.0.100:5000/api
 export function getDefaultHost(): string {
+  if (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim()) {
+    return process.env.EXPO_PUBLIC_API_URL.trim().replace(/\/$/, '');
+  }
+
+  const extraUrl = (Constants.expoConfig?.extra as any)?.apiUrl;
+  if (extraUrl && typeof extraUrl === 'string' && extraUrl.trim()) {
+    return extraUrl.trim().replace(/\/$/, '');
+  }
+
   const hostUri = Constants.expoConfig?.hostUri || (Constants as any).manifest?.debuggerHost;
   if (hostUri) {
     const ip = hostUri.split(':')[0];
