@@ -26,9 +26,12 @@ async function bootstrap() {
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   bootstrap().catch((err) => {
     logger.error('Failed to bootstrap server', err);
     process.exit(1);
   });
 }
+
+export default app;
+
