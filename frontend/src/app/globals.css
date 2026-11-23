@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Navy Blue & Red Theme — Light Mode */
+  :root {
+    --canvas: #F1F5F9;
+    --background: #FFFFFF;
+    --foreground: #0F172A;
+    --card: #F8FAFC;
+    --border: #E2E8F0;
+    --primary: #DC2626;
+    --primary-navy: #0F2942;
+  }
+
+  /* Navy Blue & Red Theme — Dark Mode */
+  .dark {
+    --canvas: #080D1A;
+    --background: #0F172A;
+    --foreground: #F8FAFC;
+    --card: #172338;
+    --border: #28364D;
+    --primary: #EF4444;
+    --primary-navy: #1E3A8A;
+  }
+}
+
+body {
+  color: #0F172A;
+  background-color: #F1F5F9;
+  min-height: 100vh;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.dark body {
+  color: #F8FAFC;
+  background-color: #080D1A;
+}
+
+/* Solid Deep Navy Card */
+.finova-liquid-wave {
+  background-color: #0F2942;
+}
+
+/* Solid Crimson Red Card when Overspent */
+.finova-liquid-wave-danger {
+  background-color: #991B1B;
+}
+
+/* Tabular Numbers */
+.tabular-numbers {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom Scrollbar in Cool Slate Navy Tones */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}

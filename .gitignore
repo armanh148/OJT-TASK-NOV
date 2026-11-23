@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+*/node_modules/
+package-lock.json.bak
+
+# Environment variables
+.env
+.env*.local
+!.env.example
+!*/.env.example
+
+# Build outputs
+backend/dist/
+dist/
+build/
+
+# Next.js
+frontend/.next/
+frontend/out/
+.next/
+out/
+
+# Mobile / Expo
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+.expo/
+*.orig.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# External reference clones (huge 600MB+ third-party library)
+references/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
+
+# AI agent caches / local transcripts
+.agents/
+.gemini/

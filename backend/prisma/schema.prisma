@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(255)
+  password_hash String    @db.VarChar(255)
+  created_at    DateTime  @default(now()) @map("created_at")
+  updated_at    DateTime  @updatedAt @map("updated_at")
+
+  incomes       Income[]
+  expenses      Expense[]
+
+  @@map("users")
+}
+
+model Income {
+  id         String    @id @default(uuid())
+  user_id    String    @map("user_id")
+  month      Int       // 1 - 12
+  year       Int       // e.g. 2026
+  amount     Decimal   @db.Decimal(14, 2)
+  created_at DateTime  @default(now()) @map("created_at")
+  updated_at DateTime  @updatedAt @map("updated_at")
+
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expenses   Expense[]
+
+  @@unique([user_id, month, year], name: "user_month_year_unique")
+  @@index([user_id, month, year])
+  @@map("incomes")
+}
+
+model Expense {
+  id         String    @id @default(uuid())
+  user_id    String    @map("user_id")
+  income_id  String?   @map("income_id")
+  name       String    @db.VarChar(150)
+  amount     Decimal   @db.Decimal(14, 2)
+  category   String    @default("OTHER") @db.VarChar(50)
+  date       DateTime  @default(now())
+  month      Int       // 1 - 12
+  year       Int       // e.g. 2026
+  created_at DateTime  @default(now()) @map("created_at")
+  updated_at DateTime  @updatedAt @map("updated_at")
+
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  income     Income?   @relation(fields: [income_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id, month, year])
+  @@map("expenses")
+}
