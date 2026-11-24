@@ -20,7 +20,10 @@ import {
   Globe,
   RotateCcw,
   Check,
+  ScanFace,
+  ShieldCheck,
 } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScreenWrapper } from '../../src/components/ScreenWrapper';
 import { Header } from '../../src/components/Header';
 import { useAuth } from '../../src/context/AuthContext';
@@ -38,13 +41,29 @@ export default function SettingsScreen() {
 
   const [apiUrl, setApiUrl] = useState('');
   const [isUrlSaved, setIsUrlSaved] = useState(false);
+  const [faceLockEnabled, setFaceLockEnabled] = useState(false);
 
   useEffect(() => {
     (async () => {
       const current = await getApiBaseUrl();
       setApiUrl(current);
+      const faceLock = await AsyncStorage.getItem('finova_face_lock');
+      if (faceLock === 'true') {
+        setFaceLockEnabled(true);
+      }
     })();
   }, []);
+
+  const handleToggleFaceLock = async (value: boolean) => {
+    setFaceLockEnabled(value);
+    await AsyncStorage.setItem('finova_face_lock', value ? 'true' : 'false');
+    Alert.alert(
+      value ? 'Face Lock Activated' : 'Face Lock Deactivated',
+      value
+        ? 'Biometric Face ID / Fingerprint lock is now active for this device.'
+        : 'Biometric Face Lock has been turned off.'
+    );
+  };
 
   const handleSaveApiUrl = async () => {
     if (!apiUrl.trim()) {
@@ -129,6 +148,34 @@ export default function SettingsScreen() {
               value={isDark}
               onValueChange={toggleTheme}
               trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+        </View>
+
+        {/* Security & Biometrics Section */}
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Security & Privacy</Text>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingLeft}>
+              <ScanFace size={20} color={faceLockEnabled ? '#0F2942' : colors.textMuted} />
+              <View style={{ flex: 1, paddingRight: 12 }}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Biometric Face Lock</Text>
+                <Text style={[styles.settingSub, { color: colors.textMuted }]}>
+                  {faceLockEnabled ? 'Protected with Face ID / Biometrics' : 'Require Face ID to unlock app'}
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={faceLockEnabled}
+              onValueChange={handleToggleFaceLock}
+              trackColor={{ false: colors.border, true: '#0F2942' }}
               thumbColor="#FFFFFF"
             />
           </View>

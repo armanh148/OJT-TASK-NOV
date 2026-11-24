@@ -1,30 +1,82 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   Coins,
   Download,
   LogOut,
   Database,
+  ScanFace,
+  Lock,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { DashboardShell } from '@/components/layout/DashboardShell';
 import { useAuth } from '@/context/AuthContext';
 import { useFinancial } from '@/context/FinancialContext';
+import { FaceLockModal } from '@/components/security/FaceLockModal';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
   const { exportCSV } = useFinancial();
+
+  // Face Lock states
+  const [faceLockEnabled, setFaceLockEnabled] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'enroll' | 'verify' | 'unlock'>('verify');
+  const [justToggled, setJustToggled] = useState(false);
+
+  useEffect(() => {
+    // Check saved preference
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('finova_face_lock_enabled');
+      if (saved === 'true') {
+        setFaceLockEnabled(true);
+      }
+    }
+  }, []);
+
+  const handleToggleFaceLock = () => {
+    if (!faceLockEnabled) {
+      // Prompt enrollment scan first
+      setModalMode('enroll');
+      setIsModalOpen(true);
+    } else {
+      // Disable
+      setFaceLockEnabled(false);
+      localStorage.setItem('finova_face_lock_enabled', 'false');
+      setJustToggled(true);
+      setTimeout(() => setJustToggled(false), 3000);
+    }
+  };
+
+  const handleEnrollSuccess = () => {
+    setFaceLockEnabled(true);
+    localStorage.setItem('finova_face_lock_enabled', 'true');
+    setJustToggled(true);
+    setTimeout(() => setJustToggled(false), 3000);
+  };
+
+  const handleTestFaceScan = () => {
+    setModalMode('verify');
+    setIsModalOpen(true);
+  };
+
+  const handleLockNow = () => {
+    setModalMode('unlock');
+    setIsModalOpen(true);
+  };
 
   return (
     <DashboardShell>
       <div className="space-y-6 max-w-3xl mx-auto">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] dark:text-[#F8FAFC] tracking-tight">
-            Profile & Security
+            Profile & Site Settings
           </h1>
           <p className="text-xs sm:text-sm text-[#475569] dark:text-[#94A3B8] mt-1 font-medium">
-            Manage your verified identity, PostgreSQL session, and export credentials.
+            Manage your verified identity, biometric Face Lock, PostgreSQL session, and audit credentials.
           </p>
         </div>
 
@@ -51,6 +103,91 @@ export default function ProfilePage() {
             <LogOut size={14} />
             <span>Sign Out</span>
           </button>
+        </div>
+
+        {/* Biometric Face Lock Security Card (NEW) */}
+        <div className="p-6 rounded-[24px] bg-gradient-to-br from-white to-[#F8FAFC] dark:from-[#152238] dark:to-[#0F172A] border-2 border-[#0F2942]/20 dark:border-[#38BDF8]/30 shadow-md transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-[#0F2942] dark:bg-[#0F2942] text-white flex items-center justify-center shadow-md shrink-0">
+                <ScanFace size={26} className="text-cyan-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm sm:text-base font-black text-[#0F172A] dark:text-[#F8FAFC]">
+                    Biometric Face Lock
+                  </h3>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 ${
+                      faceLockEnabled
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                    }`}
+                  >
+                    {faceLockEnabled ? (
+                      <>
+                        <CheckCircle2 size={10} className="text-emerald-600" />
+                        <span>Enabled</span>
+                      </>
+                    ) : (
+                      <span>Disabled</span>
+                    )}
+                  </span>
+                </div>
+                <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-1 leading-relaxed">
+                  Protect your budget with Face ID, Windows Hello, or Fingerprint authentication before accessing sensitive financial data.
+                </p>
+              </div>
+            </div>
+
+            {/* Toggle Switch */}
+            <div className="flex items-center gap-3 self-end sm:self-center">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={faceLockEnabled}
+                  onChange={handleToggleFaceLock}
+                  className="sr-only peer"
+                />
+                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-[#0F2942] dark:peer-checked:bg-cyan-600"></div>
+              </label>
+            </div>
+          </div>
+
+          {/* Interactive controls if Face Lock is enabled */}
+          {faceLockEnabled && (
+            <div className="mt-5 pt-4 border-t border-[#E2E8F0] dark:border-[#28364D] flex flex-wrap items-center justify-between gap-3 animate-fade-in">
+              <div className="flex items-center gap-2 text-xs text-[#64748B] dark:text-[#94A3B8]">
+                <Sparkles size={14} className="text-amber-500" />
+                <span>Device Biometrics Verified • Ready for Instant Face Authentication</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleTestFaceScan}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#0F2942] dark:text-cyan-300 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 transition-colors flex items-center gap-1.5"
+                >
+                  <ScanFace size={13} />
+                  <span>Test Face Scan</span>
+                </button>
+
+                <button
+                  onClick={handleLockNow}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#0F2942] hover:bg-[#1a3b5c] transition-colors flex items-center gap-1.5 shadow-sm"
+                >
+                  <Lock size={13} />
+                  <span>Lock Dashboard</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {justToggled && (
+            <div className="mt-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-fade-in">
+              <CheckCircle2 size={12} />
+              <span>Face Lock preferences updated successfully.</span>
+            </div>
+          )}
         </div>
 
         {/* Settings Grid */}
@@ -99,11 +236,20 @@ export default function ProfilePage() {
             </div>
             <div className="p-3 bg-white dark:bg-[#1E293B] rounded-xl border border-[#E2E8F0] dark:border-[#28364D]">
               <span className="text-[10px] text-[#475569] dark:text-[#94A3B8] font-bold block">Security Protocol</span>
-              <span className="font-extrabold text-[#DC2626] dark:text-[#EF4444]">HttpOnly JWT + bcrypt</span>
+              <span className="font-extrabold text-[#DC2626] dark:text-[#EF4444]">Biometric + JWT bcrypt</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Interactive Face Scanner Modal */}
+      <FaceLockModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleEnrollSuccess}
+        userName={user?.name || 'Admin'}
+        mode={modalMode}
+      />
     </DashboardShell>
   );
 }
