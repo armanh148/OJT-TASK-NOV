@@ -13,29 +13,9 @@ export const BudgetAlertBanner: React.FC = () => {
   const balanceNum = parseFloat(summary.remainingBalance) || 0;
   const percent = Math.min(Math.max(summary.percentageSpent, 0), 100);
 
-  // If no income is set yet
+  // If no income is set yet, hero card handles this cleanly
   if (totalIncomeNum === 0) {
-    return (
-      <View
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.surfaceVariant,
-            borderColor: colors.border,
-          },
-        ]}
-      >
-        <View style={styles.contentRow}>
-          <AlertTriangle size={18} color={colors.warning} />
-          <Text style={[styles.title, { color: colors.text }]}>
-            No monthly income set for this month
-          </Text>
-        </View>
-        <Text style={[styles.message, { color: colors.textMuted }]}>
-          Please set your monthly income in the "Set Income" tab to enable live balance tracking.
-        </Text>
-      </View>
-    );
+    return null;
   }
 
   // Overspent state

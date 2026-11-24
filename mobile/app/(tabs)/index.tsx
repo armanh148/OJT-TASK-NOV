@@ -77,17 +77,7 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* Month Indicator Bar */}
-        <View style={[styles.monthBanner, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}>
-          <Text style={[styles.monthBannerText, { color: colors.text }]}>
-            Viewing: <Text style={{ fontWeight: '800', color: colors.primary }}>{currentMonthName} {selectedYear}</Text>
-          </Text>
-          <TouchableOpacity onPress={() => setMonthModalVisible(true)}>
-            <Text style={[styles.switchLink, { color: colors.primary }]}>Change</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* F8: 3 Summary Cards */}
+        {/* F8: 3 Summary Cards (Hero Balance + Dual Metrics) */}
         <SummaryCards />
 
         {/* Budget Alert / Status */}
@@ -116,10 +106,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Bonus: Category Distribution */}
-        <CategoryBreakdown />
-
-        {/* Recent Expenses List */}
+        {/* F5: Recent Expenses Table (immediately below summary cards) */}
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleRow}>
             <Receipt size={18} color={colors.primary} />
@@ -143,7 +130,7 @@ export default function HomeScreen() {
               { backgroundColor: colors.surface, borderColor: colors.border },
             ]}
           >
-            <Receipt size={36} color={colors.textDim} style={{ marginBottom: 8 }} />
+            <Receipt size={32} color={colors.textDim} style={{ marginBottom: 6 }} />
             <Text style={[styles.emptyStateTitle, { color: colors.text }]}>
               No expenses recorded
             </Text>
@@ -161,6 +148,9 @@ export default function HomeScreen() {
             />
           ))
         )}
+
+        {/* Bonus: Category Distribution */}
+        {expenses.length > 0 && <CategoryBreakdown />}
       </ScrollView>
 
       {/* Month Selector Modal */}
